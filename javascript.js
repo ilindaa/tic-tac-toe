@@ -1,4 +1,4 @@
-const Gameboard = (() => {
+function gameBoard() {
     const rows = 3;
     const columns = 3;
     const board = [];
@@ -10,27 +10,69 @@ const Gameboard = (() => {
         }
     }
     
-   // Gets the entire gameboard 
+    // Gets the entire gameboard 
     const getBoard = () => board;
+
+    // If the space is empty, add the player's mark
+    const makeMark = (row, column, playerMark) => {
+        if (board[row][column] != '') return;
+
+        board[row][column].addMark(playerMark);
+    }
     
     // Prints the board object for now
     const printBoard = () => console.log(board);
 
     return {
         getBoard,
-        printBoard
+        printBoard,
+        makeMark
     };
 
-})();
+}
 
-const playerFactory = (name, mark) => {
-    return { name, mark };
+const playerFactory = (playerName, playerMark) => {
+    return { playerName, playerMark };
 };
 
-const playerOne = playerFactory('Player X', 'X');
-const playerTwo = playerFactory('Player O', 'O');
+function gameController() {
+    const board = gameBoard();
 
-console.log(playerOne.name, playerOne.mark);
-console.log(playerTwo.name, playerTwo.mark);
+    const playerOne = playerFactory('Player 1', 'X');
+    const playerTwo = playerFactory('Player 2', 'O');
 
-Gameboard.printBoard();
+    let activePlayer = playerOne;
+
+    const switchPlayerTurn = () => {
+        if (activePlayer === playerOne) {
+            activePlayer = playerTwo;
+        } else {
+            activePlayer = playerOne;
+        }
+    };
+
+    const getActivePlayer = () => activePlayer;
+
+    const printNewRound = () => {
+        board.printBoard(); 
+        console.log(`${getActivePlayer.playerName}'s turn.`);
+    }
+
+    // Take in a row and column and put the player's mark there
+    const playRound = (row, column) => {
+        console.log(`${getActivePlayer().playerName}'s turn.`)
+
+        board.makeMark(row, column, getActivePlayer().playerMark)
+        // Check for a winner, win message
+
+        switchPlayerTurn();
+        printNewRound();
+    };
+
+    return {
+        playRound,
+        getActivePlayer
+    };
+}
+
+const game = gameController();
