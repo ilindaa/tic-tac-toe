@@ -1,4 +1,4 @@
-function gameBoard() {
+function Gameboard() {
     const rows = 3;
     const columns = 3;
     const board = [];
@@ -6,7 +6,7 @@ function gameBoard() {
     for (let i = 0; i < rows; i++) {
         board[i] = [];
         for (let j = 0; j < columns; j++) {
-            board[i][j] = '';
+            board[i][j] = Cell();
         }
     }
     
@@ -21,25 +21,36 @@ function gameBoard() {
     }
     
     // Prints the board object for now
-    const printBoard = () => console.log(board);
+    // Maps the board's rows with the corresponding cell value
+    const printBoard = () => {
+        const boardWithCellValues = board.map((row) => row.map((cell) => cell.getValue()));
+        console.log(boardWithCellValues);
+    }
 
-    return {
-        getBoard,
-        printBoard,
-        makeMark
-    };
-
+    return { getBoard, makeMark, printBoard };
 }
 
-const playerFactory = (playerName, playerMark) => {
+function Cell() {
+    let value = '';
+
+    const addMark = (playerMark) => {
+        value = playerMark;
+    };
+
+    const getValue = () => value;
+
+    return { addMark, getValue };
+}
+
+const PlayerFactory = (playerName, playerMark) => {
     return { playerName, playerMark };
 };
 
-function gameController() {
-    const board = gameBoard();
+function GameController() {
+    const board = Gameboard();
 
-    const playerOne = playerFactory('Player 1', 'X');
-    const playerTwo = playerFactory('Player 2', 'O');
+    const playerOne = PlayerFactory('Player 1', 'X');
+    const playerTwo = PlayerFactory('Player 2', 'O');
 
     let activePlayer = playerOne;
 
@@ -51,28 +62,29 @@ function gameController() {
         }
     };
 
-    const getActivePlayer = () => activePlayer;
+   function getActivePlayer() {
+    return activePlayer;
+   }
 
     const printNewRound = () => {
         board.printBoard(); 
-        console.log(`${getActivePlayer.playerName}'s turn.`);
-    }
+        console.log(`${getActivePlayer().playerName}'s turn.`);
+    };
 
     // Take in a row and column and put the player's mark there
     const playRound = (row, column) => {
-        console.log(`${getActivePlayer().playerName}'s turn.`)
+        console.log(`${getActivePlayer().playerName} is marking row ${row}, column ${column}.`);
+        board.makeMark(row, column, activePlayer.playerMark);
 
-        board.makeMark(row, column, getActivePlayer().playerMark)
         // Check for a winner, win message
 
         switchPlayerTurn();
         printNewRound();
     };
 
-    return {
-        playRound,
-        getActivePlayer
-    };
+    printNewRound();
+
+    return { playRound, getActivePlayer};
 }
 
-const game = gameController();
+const game = GameController();
