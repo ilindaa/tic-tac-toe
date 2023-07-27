@@ -3,6 +3,7 @@ function Gameboard() {
     const columns = 3;
     const board = [];
 
+    // Loop through the 2D array and add a Cell to it
     for (let i = 0; i < rows; i++) {
         board[i] = [];
         for (let j = 0; j < columns; j++) {
@@ -15,7 +16,7 @@ function Gameboard() {
 
     // If the space is empty, add the player's mark
     const makeMark = (row, column, playerMark) => {
-        if (board[row][column] != '') return;
+        if (board[row][column].getValue() != '') return;
 
         board[row][column].addMark(playerMark);
     }
@@ -30,6 +31,7 @@ function Gameboard() {
     return { getBoard, makeMark, printBoard };
 }
 
+// Player can update the cell's value with their player mark and retrieve the value
 function Cell() {
     let value = '';
 
@@ -54,6 +56,7 @@ function GameController() {
 
     let activePlayer = playerOne;
 
+    // Switch the player's turn after the active player's turn is over
     const switchPlayerTurn = () => {
         if (activePlayer === playerOne) {
             activePlayer = playerTwo;
@@ -74,7 +77,7 @@ function GameController() {
     // Take in a row and column and put the player's mark there
     const playRound = (row, column) => {
         console.log(`${getActivePlayer().playerName} is marking row ${row}, column ${column}.`);
-        board.makeMark(row, column, activePlayer.playerMark);
+        board.makeMark(row, column, getActivePlayer().playerMark);
 
         // Check for a winner, win message
 
@@ -84,7 +87,49 @@ function GameController() {
 
     printNewRound();
 
-    return { playRound, getActivePlayer};
+    return { playRound, getActivePlayer, getBoard: board.getBoard };
 }
 
-const game = GameController();
+(function ScreenController() {
+    const game = GameController();
+    const playerTurnDiv = document.querySelector('.turn');
+    const boardDiv = document.querySelector('.board');
+
+    const updateScreen = () => {
+        boardDiv.textContent = '';
+
+        const board = game.getBoard();
+        const activePlayer = game.getActivePlayer();
+
+        playerTurnDiv.textContent = `${activePlayer.playerName}'s turn.`;
+
+        // Loop through the board's rows and columns, create a button element for the cell
+        // Add a data-row and data-column to track the index value of each cell
+        // Append the cell's value and button to the board
+        board.forEach((row, rowIndex) => {
+            row.forEach((cell, columnIndex) => {
+                const cellButton = document.createElement('button');
+                cellButton.classList.add('cell');
+
+                cellButton.dataset.row = rowIndex;
+                cellButton.dataset.column = columnIndex;
+
+                cellButton.textContent = cell.getValue();
+                cellButton.addEventListener('click', clickHandlerButton);
+
+                boardDiv.appendChild(cellButton);
+            })
+        })
+    }
+
+    // If there is a selected row and column, play the game and update the screen
+    function clickHandlerButton(e) {
+        const selectedRow = e.target.dataset.row;
+        const selectedColumn = e.target.dataset.column;
+
+        game.playRound(selectedRow, selectedColumn);
+        updateScreen();
+    }
+
+    updateScreen();
+})();

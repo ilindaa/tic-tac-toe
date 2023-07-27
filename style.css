@@ -1,0 +1,26 @@
+:root {
+    --rows: 3;
+    --columns: 3;
+}
+
+.board {
+    height: 300px;
+    width: 300px;
+    display: grid;
+    grid-template-columns: repeat(var(--rows), 1fr);
+    grid-template-rows: repeat(var(--columns), 1fr);
+    border: 1px solid black;
+    gap: 2px;
+    padding: 2px;
+    background-color: lightblue;
+}
+
+.cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    border: 1px solid black;
+    background: white;
+    cursor: pointer;
+}
