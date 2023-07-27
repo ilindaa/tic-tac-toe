@@ -14,10 +14,8 @@ function Gameboard() {
     // Gets the entire gameboard 
     const getBoard = () => board;
 
-    // If the space is empty, add the player's mark
+    // If the space is empty (checked in the clickHandlerBoard), add the player's mark
     const makeMark = (row, column, playerMark) => {
-        if (board[row][column].getValue() != '') return;
-
         board[row][column].addMark(playerMark);
     }
     
@@ -65,14 +63,22 @@ function GameController() {
         }
     };
 
-   function getActivePlayer() {
-    return activePlayer;
-   }
+    function getActivePlayer() {
+        return activePlayer;
+    }
 
     const printNewRound = () => {
         board.printBoard(); 
         console.log(`${getActivePlayer().playerName}'s turn.`);
     };
+
+    const checkWinner = () => {
+        // 00 - 01 - 02
+        // 10 - 11 - 12
+        // 20 - 21 - 22
+        console.log("Checking Winner");
+        // Check rows (3), columns (3), diagonals (2)
+    }
 
     // Take in a row and column and put the player's mark there
     const playRound = (row, column) => {
@@ -80,6 +86,7 @@ function GameController() {
         board.makeMark(row, column, getActivePlayer().playerMark);
 
         // Check for a winner, win message
+        checkWinner();
 
         switchPlayerTurn();
         printNewRound();
@@ -115,21 +122,28 @@ function GameController() {
                 cellButton.dataset.column = columnIndex;
 
                 cellButton.textContent = cell.getValue();
-                cellButton.addEventListener('click', clickHandlerButton);
 
                 boardDiv.appendChild(cellButton);
-            })
-        })
+            });
+        });
     }
 
     // If there is a selected row and column, play the game and update the screen
-    function clickHandlerButton(e) {
+    function clickHandlerBoard(e) {
         const selectedRow = e.target.dataset.row;
         const selectedColumn = e.target.dataset.column;
+
+        // No gaps
+        if (!selectedRow && !selectedColumn) return;
+
+        // No already chosen positions
+        const board = game.getBoard();
+        if (board[selectedRow][selectedColumn].getValue() != '') return;
 
         game.playRound(selectedRow, selectedColumn);
         updateScreen();
     }
 
+    boardDiv.addEventListener('click', clickHandlerBoard);
     updateScreen();
 })();
