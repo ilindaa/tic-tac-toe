@@ -43,7 +43,15 @@ function Cell() {
 }
 
 const PlayerFactory = (playerName, playerMark) => {
-    return { playerName, playerMark };
+    const getPlayerName = () => playerName;
+    const getPlayerMark = () => playerMark;
+
+    function setPlayerName(name) {
+        console.log("Updated!");
+        playerName = name;
+    }
+
+    return { getPlayerName, getPlayerMark, setPlayerName };
 };
 
 function GameController() {
@@ -51,10 +59,14 @@ function GameController() {
     let gameRoundNum = 0;
     let gameWinner = '';
 
-    const playerOne = PlayerFactory('Player 1', 'X');
-    const playerTwo = PlayerFactory('Player 2', 'O');
+    const playerOne = PlayerFactory('Player 1', '🍊');
+    const playerTwo = PlayerFactory('Player 2', '🍇');
 
     let activePlayer = playerOne;
+
+    // Get players
+    const getPlayerOne = () => playerOne;
+    const getPlayerTwo = () => playerTwo;
 
     // Switch the player's turn after the active player's turn is over
     const switchPlayerTurn = () => {
@@ -65,13 +77,13 @@ function GameController() {
         }
     };
 
-    function getActivePlayer() {
+    const getActivePlayer = () => {
         return activePlayer;
     }
 
     // const printNewRound = () => {
     //     board.printBoard(); 
-    //     console.log(`${getActivePlayer().playerName}'s turn.`);
+    //     console.log(`${getActivePlayer().getPlayerName()}'s turn.`);
     // };
 
     const checkWinner = () => {
@@ -126,8 +138,8 @@ function GameController() {
 
     // Take in a row and column and put the player's mark there
     const playRound = (row, column) => {
-        // console.log(`${getActivePlayer().playerName} is marking row ${row}, column ${column}.`);
-        board.makeMark(row, column, getActivePlayer().playerMark);
+        // console.log(`${getActivePlayer().getPlayerName()} is marking row ${row}, column ${column}.`);
+        board.makeMark(row, column, getActivePlayer().getPlayerMark());
 
         // Check for a winner, if there's exists a winner/tie, set that as the game winner
         let winner = checkWinner();
@@ -141,14 +153,18 @@ function GameController() {
 
     // printNewRound();
 
-    return { playRound, getActivePlayer, getBoard: board.getBoard, getGameWinner };
+    return { playRound, getActivePlayer, getBoard: board.getBoard, getGameWinner, getPlayerOne, getPlayerTwo };
 }
 
-(function ScreenController() {
+function ScreenController() {
     const game = GameController();
     const playerTurnDiv = document.querySelector('.turn');
-    const boardDiv = document.querySelector('.board');
     const playerWinnerDiv = document.querySelector('.winner');
+    const boardDiv = document.querySelector('.board');
+    const playAgainButton = document.getElementById('play-again');
+
+    const playerOne = game.getPlayerOne();
+    const playerTwo = game.getPlayerTwo();
 
     const updateScreen = () => {
         boardDiv.textContent = '';
@@ -156,7 +172,7 @@ function GameController() {
         const board = game.getBoard();
         const activePlayer = game.getActivePlayer();
 
-        playerTurnDiv.textContent = `${activePlayer.playerName}'s turn.`;
+        playerTurnDiv.textContent = `${activePlayer.getPlayerName()}'s (${activePlayer.getPlayerMark()}) turn.`;
 
         // Loop through the board's rows and columns, create a button element for the cell
         // Add a data-row and data-column to track the index value of each cell
@@ -184,18 +200,31 @@ function GameController() {
         // If there is no winner, return nothing (do nothing)
         if (winner === '') return;
 
-        if (winner === 'X') {
-            playerWinnerDiv.textContent = 'X has won!';
-        } else if (winner === 'O') {
-            playerWinnerDiv.textContent = 'O has won!';
+        if (winner === playerOne.getPlayerMark()) {
+            playerWinnerDiv.textContent = `${playerOne.getPlayerName()} (${playerOne.getPlayerMark()}) has won!`;
+        } else if (winner === playerTwo.getPlayerMark()) {
+            playerWinnerDiv.textContent = `${playerTwo.getPlayerName()} (${playerTwo.getPlayerMark()}) has won!`;
         } else if (winner === 'Tie') {
             playerWinnerDiv.textContent = 'Tie! No winner.';
         }
 
-        playerTurnDiv.textContent = 'Game over!';
-
+        playerTurnDiv.textContent = 'GAME OVER';
         boardDiv.removeEventListener('click', clickHandlerBoard);
+        playAgainButton.style.visibility = 'visible';
     }
+
+    // function changePlayerNames() {
+    //     const playerOneText = document.getElementById('player-one');
+    //     const playerTwoText = document.getElementById('player-two');
+
+    //     playerOne.setPlayerName(playerOneText.value);
+    //     playerTwo.setPlayerName(playerTwoText.value);
+
+    //     playerOneText.value = '';
+    //     playerTwoText.value = '';
+
+    //     updateScreen();
+    // }
 
     // If there is a selected row and column, play the game and update the screen
     function clickHandlerBoard(e) {
@@ -213,7 +242,13 @@ function GameController() {
         updateScreen();
     }
 
-    // Runs at page load
+    // Runs at page load, function call
     boardDiv.addEventListener('click', clickHandlerBoard);
     updateScreen();
-})();
+    playerWinnerDiv.textContent = '';
+    playAgainButton.style.visibility = 'hidden';
+
+    /* return { changePlayerNames }; */
+}
+
+ScreenController();

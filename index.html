@@ -3,16 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe</title>
+    <title>Tic-tac-toe</title>
     <link href="style.css" rel="stylesheet">
     <script src="javascript.js" defer></script>
 </head>
 <body>
     <div class="display-box">
+        <h1>Tic-tac-toe</h1>
+        <!--
+        <div class="player-names">
+            <label for="player-one">Player One's Name:</label>
+            <input type="text" id="player-one" name="player-two">
+
+            <label for="player-two">Player Two's Name:</label>
+            <input type="text" id="player-two" name="player-two">
+            <button type="button" onclick="changePlayerNames();">Confirm Names</button>
+        </div> -->
         <div class="turn"></div>
         <div class="winner"></div>
         <div class="board"></div>
-        <button style="display: none;" onclick="startGame();">Play Again?</button>
+        <button id="play-again" onclick="ScreenController();">Play Again?</button>
     </div>
 </body>
 </html>
