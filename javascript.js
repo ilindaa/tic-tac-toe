@@ -18,15 +18,8 @@ function Gameboard() {
     const makeMark = (row, column, playerMark) => {
         board[row][column].addMark(playerMark);
     }
-    
-    // Prints the board object for now
-    // Maps the board's rows with the corresponding cell value
-    // const printBoard = () => {
-    //     const boardWithCellValues = board.map((row) => row.map((cell) => cell.getValue()));
-    //     console.log(boardWithCellValues);
-    // }
 
-    return { getBoard, makeMark/*, printBoard */ };
+    return { getBoard, makeMark };
 }
 
 // Player can update the cell's value with their player mark and retrieve the value
@@ -42,16 +35,21 @@ function Cell() {
     return { addMark, getValue };
 }
 
-const PlayerFactory = (playerName, playerMark) => {
+const PlayerFactory = (playerName, playerMark, playerScore) => {
     const getPlayerName = () => playerName;
     const getPlayerMark = () => playerMark;
+    const getPlayerScore = () => playerScore;
 
     function setPlayerName(name) {
         console.log("Updated!");
         playerName = name;
     }
 
-    return { getPlayerName, getPlayerMark, setPlayerName };
+    function incrementPlayerScore() {
+        playerScore += 1;
+    }
+
+    return { getPlayerName, getPlayerMark, getPlayerScore, setPlayerName, incrementPlayerScore };
 };
 
 function GameController() {
@@ -59,8 +57,8 @@ function GameController() {
     let gameRoundNum = 0;
     let gameWinner = '';
 
-    const playerOne = PlayerFactory('Player 1', '🍊');
-    const playerTwo = PlayerFactory('Player 2', '🍇');
+    const playerOne = PlayerFactory('Player One', 'Chips', 0);
+    const playerTwo = PlayerFactory('Player Two', 'Cola', 0);
 
     let activePlayer = playerOne;
 
@@ -81,16 +79,10 @@ function GameController() {
         return activePlayer;
     }
 
-    // const printNewRound = () => {
-    //     board.printBoard(); 
-    //     console.log(`${getActivePlayer().getPlayerName()}'s turn.`);
-    // };
-
     const checkWinner = () => {
         // 00 - 01 - 02
         // 10 - 11 - 12
         // 20 - 21 - 22
-        // console.log("Checking Winner", gameRoundNum);
         // Ex: Check rows (3), columns (3), diagonals (2)
         const b = board.getBoard().map((row) => row.map((cell) => cell.getValue()));
         const rows = b.length;
@@ -138,20 +130,22 @@ function GameController() {
 
     // Take in a row and column and put the player's mark there
     const playRound = (row, column) => {
-        // console.log(`${getActivePlayer().getPlayerName()} is marking row ${row}, column ${column}.`);
         board.makeMark(row, column, getActivePlayer().getPlayerMark());
 
         // Check for a winner, if there's exists a winner/tie, set that as the game winner
         let winner = checkWinner();
         if (winner != '') {
             gameWinner = winner;
+            // If the winning mark is equal to a player's mark, increment the winning player's score by 1
+            if (winner === playerOne.getPlayerMark()) {
+                playerOne.incrementPlayerScore();
+            } else if (winner === playerTwo.getPlayerMark()) {
+                playerTwo.incrementPlayerScore();
+            }
         }
 
         switchPlayerTurn();
-        // printNewRound();
     };
-
-    // printNewRound();
 
     return { playRound, getActivePlayer, getBoard: board.getBoard, getGameWinner, getPlayerOne, getPlayerTwo };
 }
@@ -163,8 +157,16 @@ function ScreenController() {
     const boardDiv = document.querySelector('.board');
     const playAgainButton = document.getElementById('play-again');
 
+    const playerOneNameDiv = document.querySelector('.player-one-name');
+    const playerTwoNameDiv = document.querySelector('.player-two-name');
+    const playerOneScoreDiv = document.querySelector('.player-one-score');
+    const playerTwoScoreDiv = document.querySelector('.player-two-score');
+
     const playerOne = game.getPlayerOne();
     const playerTwo = game.getPlayerTwo();
+
+    playerOneNameDiv.textContent = `(${playerOne.getPlayerMark()}) ${playerOne.getPlayerName()}`;
+    playerTwoNameDiv.textContent = `(${playerTwo.getPlayerMark()}) ${playerTwo.getPlayerName()}`;
 
     const updateScreen = () => {
         boardDiv.textContent = '';
@@ -172,7 +174,7 @@ function ScreenController() {
         const board = game.getBoard();
         const activePlayer = game.getActivePlayer();
 
-        playerTurnDiv.textContent = `${activePlayer.getPlayerName()}'s (${activePlayer.getPlayerMark()}) turn.`;
+        playerTurnDiv.textContent = `(${activePlayer.getPlayerMark()}) ${activePlayer.getPlayerName()}'s turn.`;
 
         // Loop through the board's rows and columns, create a button element for the cell
         // Add a data-row and data-column to track the index value of each cell
@@ -185,7 +187,17 @@ function ScreenController() {
                 cellButton.dataset.row = rowIndex;
                 cellButton.dataset.column = columnIndex;
 
-                cellButton.textContent = cell.getValue();
+                // Updated x's and o's to images inside the button
+                const pic = new Image(90, 90);
+
+                if (cell.getValue() === playerOne.getPlayerMark()) {
+                    pic.src = "./Images/chips.png";
+                    cellButton.appendChild(pic);
+
+                } else if (cell.getValue() === playerTwo.getPlayerMark()) {
+                    pic.src = "./Images/cola.png";
+                    cellButton.appendChild(pic);
+                }
 
                 boardDiv.appendChild(cellButton);
             });
@@ -193,6 +205,9 @@ function ScreenController() {
 
         // Gets GameController()'s gameWinner
         winMessage(game.getGameWinner());
+        // Update the score in the player score div
+        playerOneScoreDiv.textContent = `Score: ${playerOne.getPlayerScore()}`;
+        playerTwoScoreDiv.textContent = `Score: ${playerTwo.getPlayerScore()}`;
     }
 
     // Display the win message, end the game, remove the boardDiv event listener that handles the board
@@ -201,9 +216,9 @@ function ScreenController() {
         if (winner === '') return;
 
         if (winner === playerOne.getPlayerMark()) {
-            playerWinnerDiv.textContent = `${playerOne.getPlayerName()} (${playerOne.getPlayerMark()}) has won!`;
+            playerWinnerDiv.textContent = `(${playerOne.getPlayerMark()}) ${playerOne.getPlayerName()} won!`;
         } else if (winner === playerTwo.getPlayerMark()) {
-            playerWinnerDiv.textContent = `${playerTwo.getPlayerName()} (${playerTwo.getPlayerMark()}) has won!`;
+            playerWinnerDiv.textContent = `(${playerTwo.getPlayerMark()}) ${playerTwo.getPlayerName()} won!`;
         } else if (winner === 'Tie') {
             playerWinnerDiv.textContent = 'Tie! No winner.';
         }
@@ -213,18 +228,18 @@ function ScreenController() {
         playAgainButton.style.visibility = 'visible';
     }
 
-    // function changePlayerNames() {
-    //     const playerOneText = document.getElementById('player-one');
-    //     const playerTwoText = document.getElementById('player-two');
+    function changePlayerNames() {
+        const playerOneText = document.getElementById('player-one');
+        const playerTwoText = document.getElementById('player-two');
 
-    //     playerOne.setPlayerName(playerOneText.value);
-    //     playerTwo.setPlayerName(playerTwoText.value);
+        playerOne.setPlayerName(playerOneText.value);
+        playerTwo.setPlayerName(playerTwoText.value);
 
-    //     playerOneText.value = '';
-    //     playerTwoText.value = '';
+        playerOneText.value = '';
+        playerTwoText.value = '';
 
-    //     updateScreen();
-    // }
+        updateScreen();
+    }
 
     // If there is a selected row and column, play the game and update the screen
     function clickHandlerBoard(e) {
@@ -248,7 +263,7 @@ function ScreenController() {
     playerWinnerDiv.textContent = '';
     playAgainButton.style.visibility = 'hidden';
 
-    /* return { changePlayerNames }; */
+    return { changePlayerNames };
 }
 
 ScreenController();
