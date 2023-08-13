@@ -50,7 +50,6 @@ const PlayerFactory = (playerName, playerMark, playerScore) => {
     const getPlayerScore = () => playerScore;
 
     function setPlayerName(name) {
-        console.log("Updated!");
         playerName = name;
     }
 
@@ -172,25 +171,21 @@ function ScreenController() {
     const playerTurnDiv = document.querySelector('.turn');
     const playerWinnerDiv = document.querySelector('.winner');
     const boardDiv = document.querySelector('.board');
-    const playAgainButton = document.getElementById('play-again');
+    const playAgainButton = document.getElementById('play-again-btn');
+    const menuButton = document.getElementById('menu-btn');
 
-    const playerOneNameDiv = document.querySelector('.player-one-name');
-    const playerTwoNameDiv = document.querySelector('.player-two-name');
     const playerOneScoreDiv = document.querySelector('.player-one-score');
     const playerTwoScoreDiv = document.querySelector('.player-two-score');
 
     const playerOne = game.getPlayerOne();
     const playerTwo = game.getPlayerTwo();
-    const activePlayer = game.getActivePlayer();
-
-    playerOneNameDiv.textContent = `(${playerOne.getPlayerMark()}) ${playerOne.getPlayerName()}`;
-    playerTwoNameDiv.textContent = `(${playerTwo.getPlayerMark()}) ${playerTwo.getPlayerName()}`;
 
     const updateScreen = () => {
         boardDiv.textContent = '';
+        // Active player changes, need to get it each time
+        const activePlayer = game.getActivePlayer();
 
         playerTurnDiv.textContent = `(${activePlayer.getPlayerMark()}) ${activePlayer.getPlayerName()}'s turn.`;
-
         // Loop through the board's rows and columns, create a button element for the cell
         // Add a data-row and data-column to track the index value of each cell
         // Append the cell's value and button to the board
@@ -241,20 +236,7 @@ function ScreenController() {
 
         playerTurnDiv.textContent = 'GAME OVER';
         boardDiv.removeEventListener('click', clickHandlerBoard);
-        playAgainButton.style.visibility = 'visible';
-    }
-
-    function changePlayerNames() {
-        const playerOneText = document.getElementById('player-one');
-        const playerTwoText = document.getElementById('player-two');
-
-        playerOne.setPlayerName(playerOneText.value);
-        playerTwo.setPlayerName(playerTwoText.value);
-
-        playerOneText.value = '';
-        playerTwoText.value = '';
-
-        updateScreen();
+        playAgainButton.style.display = 'block';
     }
 
     // If there is a selected row and column, play the game and update the screen
@@ -274,23 +256,58 @@ function ScreenController() {
 
     // Restart the game
     function restartGame() {
+        const activePlayer = game.getActivePlayer();
         game.reset();
         game.getGameboard.reset();
+        playerTurnDiv.textContent = `(${activePlayer.getPlayerMark()}) ${activePlayer.getPlayerName()}'s turn.`;;
+        runsAtRestartAndPageLoad();
+    }
+
+    function runsAtRestartAndPageLoad() {
         updateScreen();
         boardDiv.addEventListener('click', clickHandlerBoard);
         playerWinnerDiv.textContent = '';
-        playerTurnDiv.textContent = `(${activePlayer.getPlayerMark()}) ${activePlayer.getPlayerName()}'s turn.`;;
-        playAgainButton.style.visibility = 'hidden';
+        playAgainButton.style.display = 'none';
     }
 
-    // Runs at page load, function call
-    boardDiv.addEventListener('click', clickHandlerBoard);
-    updateScreen();
-    playerWinnerDiv.textContent = '';
-    playAgainButton.style.visibility = 'hidden';
+    function updatePlayerNames() {
+        const playerOneText = document.getElementById('player-one');
+        const playerTwoText = document.getElementById('player-two');
+        const playerOneNameDiv = document.querySelector('.player-one-name');
+        const playerTwoNameDiv = document.querySelector('.player-two-name');
+        const namesForm = document.getElementById('names-form');
+        const gameContainer = document.querySelector('.game-container');
+        namesForm.style.display = 'none';
+        gameContainer.style.display = 'block';
+        menuButton.style.display = 'block';
+
+        // Set the names if they're not left empty, else keep the default Player One and Player Two
+        if (playerOneText.value != '') {
+            playerOne.setPlayerName(playerOneText.value);
+        }
+        if (playerTwoText.value != '') {
+            playerTwo.setPlayerName(playerTwoText.value);
+        }
+
+        playerOneNameDiv.textContent = `(${playerOne.getPlayerMark()}) ${playerOne.getPlayerName()}`;
+        playerTwoNameDiv.textContent = `(${playerTwo.getPlayerMark()}) ${playerTwo.getPlayerName()}`;
+        playerOneText.value = '';
+        playerTwoText.value = '';
+
+        updateScreen();
+    }
+
+    function backToMenu() {
+        const namesForm = document.getElementById('names-form');
+        const gameContainer = document.querySelector('.game-container');
+        namesForm.style.display = 'block';
+        gameContainer.style.display = 'none';
+        menuButton.style.display = 'none';
+    }
+
+    // Add event listeners to the play again btn and menu btn
     playAgainButton.addEventListener('click', restartGame);
-
-    return { changePlayerNames };
+    menuButton.addEventListener('click', backToMenu);
+    runsAtRestartAndPageLoad();
+    updatePlayerNames();
 }
-
-ScreenController();

@@ -9,35 +9,46 @@
     <script src="javascript.js" defer></script>
 </head>
 <body>
-    <div class="display-box">
+    <div class="display-container">
         <h1>Tic Tac Toe</h1>
-        <div class="player-names" hidden> <!-- Hidden -->
-            <form id="">
-                <label for="player-one">Player One's Name:</label>
-                <input type="text" id="player-one" name="player-two" required>
-                <label for="player-two">Player Two's Name:</label>
-                <input type="text" id="player-two" name="player-two" required>
-                <button type="submit" class="game-btn" onclick="changePlayerNames()">Submit</button>
+        <div class="player-names">
+            <form id="names-form" onsubmit="event.preventDefault(); ScreenController()">
+                <div class="form-content">
+                    <div class="form-item">
+                        <label for="player-one"><img src="Images/chips.png" class="label-img">Player One's Name:</label>
+                        <input type="text" id="player-one" name="player-two">
+                    </div>
+                    <div class="form-item">
+                        <label for="player-two"><img src="Images/cola.png" class="label-img">Player Two's Name:</label>
+                        <input type="text" id="player-two" name="player-two">
+                    </div>
+                    <div class="submit-div">
+                        <button type="submit" class="game-btn">Submit</button>
+                    </div>
+                </div>
             </form>
         </div>
-        <div class="game-area">
-            <div class="player-one-info">
-                <div class="player-one-img"><img src="./Images/chips.png"></div>
-                <div class="player-one-name"></div>
-                <div class="player-one-score"></div>
-            </div>
-            <div class="middle">
-                <div class="turn"></div>
-                <div class="winner"></div>
-                <div class="board"></div>
-                <button id="play-again" class="game-btn">Play Again?</button>
-            </div>
-            <div class="player-two-info">
-                <div class="player-two-img"><img src="./Images/cola.png"></div>
-                <div class="player-two-name"></div>
-                <div class="player-two-score"></div>
+        <div class="game-container">
+            <div class="game-area">
+                <div class="player-one-info">
+                    <div class="player-one-img"><img src="./Images/chips.png"></div>
+                    <div class="player-one-name"></div>
+                    <div class="player-one-score"></div>
+                </div>
+                <div class="middle">
+                    <div class="turn"></div>
+                    <div class="winner"></div>
+                    <div class="board"></div>
+                    <button type="button" id="play-again-btn" class="game-btn">Play Again?</button>
+                </div>
+                <div class="player-two-info">
+                    <div class="player-two-img"><img src="./Images/cola.png"></div>
+                    <div class="player-two-name"></div>
+                    <div class="player-two-score"></div>
+                </div>
             </div>
         </div>
+        <button type="button" id="menu-btn" class="game-btn">Menu</button>
     </div>
 </body>
 </html>
