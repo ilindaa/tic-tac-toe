@@ -19,7 +19,16 @@ function Gameboard() {
         board[row][column].addMark(playerMark);
     }
 
-    return { getBoard, makeMark };
+    const reset = () => {
+        for (let i = 0; i < rows; i++) {
+            board[i] = [];
+            for (let j = 0; j < columns; j++) {
+                board[i][j] = Cell();
+            }
+        }
+    }
+
+    return { getBoard, makeMark, reset };
 }
 
 // Player can update the cell's value with their player mark and retrieve the value
@@ -147,11 +156,19 @@ function GameController() {
         switchPlayerTurn();
     };
 
-    return { playRound, getActivePlayer, getBoard: board.getBoard, getGameWinner, getPlayerOne, getPlayerTwo };
+    const reset = () => {
+        gameWinner = '';
+        activePlayer = playerOne;
+        gameRoundNum = 0;
+    }
+
+    // getGameboard retrieves the board module, getBoard retrieves the board module's gameboard (array)
+    return { playRound, getActivePlayer, getGameboard: board, getBoard: board.getBoard, getGameWinner, getPlayerOne, getPlayerTwo, reset };
 }
 
 function ScreenController() {
     const game = GameController();
+    const board = game.getBoard();
     const playerTurnDiv = document.querySelector('.turn');
     const playerWinnerDiv = document.querySelector('.winner');
     const boardDiv = document.querySelector('.board');
@@ -164,15 +181,13 @@ function ScreenController() {
 
     const playerOne = game.getPlayerOne();
     const playerTwo = game.getPlayerTwo();
+    const activePlayer = game.getActivePlayer();
 
     playerOneNameDiv.textContent = `(${playerOne.getPlayerMark()}) ${playerOne.getPlayerName()}`;
     playerTwoNameDiv.textContent = `(${playerTwo.getPlayerMark()}) ${playerTwo.getPlayerName()}`;
 
     const updateScreen = () => {
         boardDiv.textContent = '';
-
-        const board = game.getBoard();
-        const activePlayer = game.getActivePlayer();
 
         playerTurnDiv.textContent = `(${activePlayer.getPlayerMark()}) ${activePlayer.getPlayerName()}'s turn.`;
 
@@ -188,13 +203,14 @@ function ScreenController() {
                 cellButton.dataset.column = columnIndex;
 
                 // Updated x's and o's to images inside the button
-                const pic = new Image(90, 90);
 
                 if (cell.getValue() === playerOne.getPlayerMark()) {
+                    const pic = new Image(90, 90);
                     pic.src = "./Images/chips.png";
                     cellButton.appendChild(pic);
 
                 } else if (cell.getValue() === playerTwo.getPlayerMark()) {
+                    const pic = new Image(90, 90);
                     pic.src = "./Images/cola.png";
                     cellButton.appendChild(pic);
                 }
@@ -250,11 +266,21 @@ function ScreenController() {
         if (!selectedRow && !selectedColumn) return;
 
         // No already chosen positions
-        const board = game.getBoard();
         if (board[selectedRow][selectedColumn].getValue() != '') return;
 
         game.playRound(selectedRow, selectedColumn);
         updateScreen();
+    }
+
+    // Restart the game
+    function restartGame() {
+        game.reset();
+        game.getGameboard.reset();
+        updateScreen();
+        boardDiv.addEventListener('click', clickHandlerBoard);
+        playerWinnerDiv.textContent = '';
+        playerTurnDiv.textContent = `(${activePlayer.getPlayerMark()}) ${activePlayer.getPlayerName()}'s turn.`;;
+        playAgainButton.style.visibility = 'hidden';
     }
 
     // Runs at page load, function call
@@ -262,6 +288,7 @@ function ScreenController() {
     updateScreen();
     playerWinnerDiv.textContent = '';
     playAgainButton.style.visibility = 'hidden';
+    playAgainButton.addEventListener('click', restartGame);
 
     return { changePlayerNames };
 }

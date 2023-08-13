@@ -10,6 +10,8 @@
 :root {
     --rows: 3;
     --columns: 3;
+    --orange-color: #f4814c;
+    --cell-hover-color: whitesmoke;
 }
 
 body {
@@ -17,7 +19,7 @@ body {
 }
 
 .game-btn {
-    background-color: #f4814c;
+    background-color: var(--orange-color);
     font-size: 1rem;
     font-weight: bold;
     padding: 0.5rem;
@@ -56,6 +58,7 @@ body {
 
 .board .cell {
     outline: 4px solid #000;
+    z-index: 1;
 }
 
 .board .cell:last-child {
@@ -67,6 +70,11 @@ body {
     font-size: 2rem;
     border: none;
     cursor: pointer;
+}
+
+.cell:hover {
+    background-color: var(--cell-hover-color);
+    z-index: 0;
 }
 
 .game-area {
