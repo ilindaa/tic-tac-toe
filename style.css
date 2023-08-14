@@ -10,12 +10,13 @@
 :root {
     --rows: 3;
     --columns: 3;
-    --orange-color: #f4814c;
-    --cell-hover-color: whitesmoke;
+    --orange-color: #fa9262;
+    --blue-color: #a6d1ff;
+    --bg-color: #f4f5f5;
 }
 
 body {
-    background-color: #fff;
+    background-color: var(--bg-color);
 }
 
 h1 {
@@ -26,7 +27,7 @@ h1 {
 input[type="text"] {
     font-size: 1rem;
     border-radius: 0.25rem;
-    padding: 0.5rem;
+    padding: 0.5rem 0.8rem;
 }
 
 .game-btn {
@@ -81,8 +82,13 @@ input[type="text"] {
 }
 
 .cell:hover {
-    background-color: var(--cell-hover-color);
+    background-color: var(--blue-color);
     z-index: 0;
+}
+
+.game-area,
+.game-container {
+    width: 100%;
 }
 
 .game-container {
@@ -90,17 +96,33 @@ input[type="text"] {
 }
 
 .game-area {
-    width: 100%;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
 }
 
 .player-one-info,
 .player-two-info,
-.middle {
+.middle,
+.player-text {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
+    padding: 1rem;
+}
+
+.player-one-info,
+.player-two-info {
+    gap: 1rem;
+}
+
+.active-player-bg {
+    background-color: var(--blue-color);
+    border-radius: 0.25rem;
+}
+
+.board {
+    margin: 1.5rem;
 }
 
 #names-form {

@@ -174,18 +174,30 @@ function ScreenController() {
     const playAgainButton = document.getElementById('play-again-btn');
     const menuButton = document.getElementById('menu-btn');
 
-    const playerOneScoreDiv = document.querySelector('.player-one-score');
-    const playerTwoScoreDiv = document.querySelector('.player-two-score');
-
     const playerOne = game.getPlayerOne();
     const playerTwo = game.getPlayerTwo();
 
     const updateScreen = () => {
         boardDiv.textContent = '';
+
+        const playerOneScoreDiv = document.querySelector('.player-one-score');
+        const playerTwoScoreDiv = document.querySelector('.player-two-score');
+        const playerOneImgDiv = document.querySelector('.player-one-img');
+        const playerTwoImgDiv = document.querySelector('.player-two-img');
+
         // Active player changes, need to get it each time
         const activePlayer = game.getActivePlayer();
 
         playerTurnDiv.textContent = `(${activePlayer.getPlayerMark()}) ${activePlayer.getPlayerName()}'s turn.`;
+
+        if (activePlayer.getPlayerName() === playerOne.getPlayerName()) {
+            playerOneImgDiv.classList.add('active-player-bg');
+            playerTwoImgDiv.classList.remove('active-player-bg');
+        } else {
+            playerTwoImgDiv.classList.add('active-player-bg');
+            playerOneImgDiv.classList.remove('active-player-bg');
+        }
+
         // Loop through the board's rows and columns, create a button element for the cell
         // Add a data-row and data-column to track the index value of each cell
         // Append the cell's value and button to the board
